@@ -1,0 +1,118 @@
+swagger: '2.0'
+info:
+  description: This is utility service to provide asychronize logging
+  version: '1.0'
+  title: Utility - Logging Service
+  termsOfService: 'http://springfox.io'
+schemes:
+  - http
+host: 'localhost:9031'
+basePath: /utility/v1
+tags:
+  - name: Logging Service
+    description: Logging Service to allow other services to log messages synchronazely
+paths:
+  /logs:
+    get:
+      tags:
+        - Logging Service
+      summary: Get all the logged messages
+      operationId: gitLogs
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: meaningful_query_param
+          in: query
+          description: meaningful_query_param
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/LogContent'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    post:
+      tags:
+        - Logging Service
+      summary: Add new message to be pesisted
+      operationId: addLog
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: payload
+          description: payload
+          required: true
+          schema:
+            $ref: '#/definitions/NewLogContent'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/LogContent'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/logs/{id}':
+    get:
+      tags:
+        - Logging Service
+      summary: Get the logged messages with the specified log id
+      operationId: findLogWithID
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Log id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/LogContent'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  LogContent:
+    type: object
+    allOf:
+      - $ref: '#/definitions/NewLogContent'
+      - required:
+          - id
+        properties:
+          id:
+            type: integer
+            format: int64
+  NewLogContent:
+    type: object
+    properties:
+      appName:
+        type: string
+      content:
+        type: string

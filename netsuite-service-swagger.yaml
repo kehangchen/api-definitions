@@ -1,0 +1,107 @@
+swagger: '2.0'
+info:
+  description: This is a task service to create and upload Netsuite file
+  version: '1.0'
+  title: Task - Netsuite Service
+  termsOfService: 'http://springfox.io'
+schemes:
+  - http
+host: 'localhost:9034'
+basePath: /task/v1
+tags:
+  - name: Netsuite Service
+    description: Task Service to create and upload netsuite records
+paths:
+  /netsuite/prepare:
+    post:
+      tags:
+        - Netsuite Service
+      summary: Prepare proper records
+      operationId: prepareRecords
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: payload
+          description: payload
+          required: true
+          schema:
+            $ref: '#/definitions/NetSuitePrepareRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/NetSuitePrepareResponse'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /newsuite/upload:
+    post:
+      tags:
+        - Netsuite Service
+      summary: Upload prepared records to Netsuite site
+      operationId: uploadRecords
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: payload
+          description: payload
+          required: true
+          schema:
+            $ref: '#/definitions/NetSuiteUploadRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/NetSuiteUploadResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  NetSuitePrepareResponse:
+    type: object
+    allOf:
+      - $ref: '#/definitions/NetSuitePrepareRequest'
+      - required:
+          - id
+        properties:
+          id:
+            type: integer
+            format: int64
+  NetSuitePrepareRequest:
+    type: object
+    properties:
+      jobName:
+        type: string
+      username:
+        type: string
+  NetSuiteUploadResponse:
+    type: object
+    allOf:
+      - $ref: '#/definitions/NetSuiteUploadRequest'
+      - required:
+          - id
+        properties:
+          id:
+            type: integer
+            format: int64
+  NetSuiteUploadRequest:
+    type: object
+    properties:
+      batchName:
+        type: string
+      content:
+        type: string

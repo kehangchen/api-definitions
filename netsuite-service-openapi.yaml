@@ -1,0 +1,130 @@
+openapi: 3.0.0
+info:
+  description: This is a task service to create and upload Netsuite file
+  version: '1.0'
+  title: Task - Netsuite Service
+  termsOfService: 'http://springfox.io'
+  contact:
+    name: MeS SOA Team
+    email: kchen@merchante-solutions.com
+    url: 'http://www.merchante-solutions.com'
+servers: 
+  - url: 'http://localhost:9024/task/v1/'
+tags:
+  - name: Netsuite Service
+    description: Task Service to create and upload netsuite records
+paths:
+  /netsuite/prepare:
+    post:
+      tags:
+        - Netsuite Service
+      description: Prepare proper records
+      operationId: prepareRecords
+      requestBody:
+        description: Information needed for preparing records
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NetSuitePrepareRequest'
+      responses:
+        '200':
+          description: Netsuite prepare service response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetSuitePrepareResponse'
+              example:
+                - id: 1
+                  firstName: John
+                  lastName: Doe
+                  ssn: 111-222-1113
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /newsuite/upload:
+    post:
+      tags:
+        - Netsuite Service
+      description: Upload prepared records to Netsuite site
+      operationId: uploadRecords
+      requestBody:
+        description: Upload records
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NetSuiteUploadRequest'
+      responses:
+        '200':
+          description: Netsuite upload service response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetSuiteUploadesponse'
+              example:
+                id: 1
+                firstName: John
+                lastName: Joe
+                ssn: 111-222-1114
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    NetSuitePrepareRequest:
+      required: 
+        - jobName
+        - username
+      properties:
+        jobName:
+          type: string
+        username:
+          type: string
+        ssn:
+          type: string
+    NetSuitePrepareResponse:
+      allOf:
+        - $ref: '#/components/schemas/NetSuitePrepareRequest'
+        - required:
+            - id
+          properties:
+            id:
+              type: integer
+              format: int64
+    NetSuiteUploadRequest:
+      required: 
+        - batchName
+        - content
+      properties:
+        batchName:
+          type: string
+        content:
+          type: string
+        ssn:
+          type: string
+    NetSuiteUploadesponse:
+      allOf:
+        - $ref: '#/components/schemas/NetSuiteUploadRequest'
+        - required:
+            - id
+          properties:
+            id:
+              type: integer
+              format: int64
+    Error:
+      required:
+        - code
+        - message
+      properties:
+          code:
+            type: integer
+            format: int32
+          message:
+            type: string

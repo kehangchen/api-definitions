@@ -1,0 +1,139 @@
+openapi: 3.0.0
+info:
+  description: This is utility service to provide asychronize logging
+  version: '1.0'
+  title: Utility - Logging Service
+  termsOfService: 'http://springfox.io'
+  contact:
+    name: MeS SOA Team
+    email: kchen@merchante-solutions.com
+    url: 'http://www.merchante-solutions.com'
+servers: 
+  - url: 'http://localhost:9021/utility/v1/'
+tags:
+  - name: Logging Service
+    description: Logging Service to allow other services to log messages synchronazely
+paths:
+  /logs:
+    get:
+      tags:
+        - Logging Service
+      description: Get all the logged messages
+      operationId: getLogs
+      parameters:
+        - name: limit
+          in: query
+          description: maximum number of results to return
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Log service response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LogContent'
+              example:
+                - id: 1
+                  appName: user-service
+                  content: user just logged in to the system
+                - id: 2
+                  appName: merchant-service
+                  content: merchant just logged in to the system
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Logging Service
+      description: Add new message to be pesisted
+      operationId: addLog
+      requestBody:
+        description: Log message to add to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewLogContent'
+      responses:
+        '200':
+          description: Log service response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogContent'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/logs/{id}':
+    get:
+      tags:
+        - Logging Service
+      description: >-
+         Get the logged messages with the specified log id
+      operationId: findLogWithID
+      parameters:
+        - name: id
+          in: path
+          description: log message id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Log service response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogContent'
+              example:
+                id: 1
+                appName: user-service
+                content: user just logged in to the system 
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    NewLogContent:
+      required:
+        - appName
+      properties:
+        appName:
+          type: string
+        content:
+          type: string
+    LogContent:
+      allOf:
+        - $ref: '#/components/schemas/NewLogContent'
+        - required:
+            - id
+          properties:
+            id:
+              type: integer
+              format: int64
+    Error:
+      required:
+        - code
+        - message
+      properties:
+          code:
+            type: integer
+            format: int32
+          message:
+            type: string
+

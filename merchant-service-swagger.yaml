@@ -1,0 +1,120 @@
+swagger: '2.0'
+info:
+  description: This is restful service to manage nerchants
+  version: '1.0'
+  title: Data - Merchnat Service
+  termsOfService: 'http://springfox.io'
+schemes:
+  - http
+host: 'localhost:9033'
+basePath: /data/v1
+tags:
+  - name: Merchant Service
+    description: Data Service to allow merchant management
+paths:
+  /merchants:
+    get:
+      tags:
+        - Merchant Service
+      summary: Get all the merchants
+      operationId: gitMerchants
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: meaningful_query_param
+          in: query
+          description: meaningful_query_param
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Merchant'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    post:
+      tags:
+        - Merchant Service
+      summary: Add a new merchant to the system
+      operationId: addMerchant
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: payload
+          description: payload
+          required: true
+          schema:
+            $ref: '#/definitions/NewMerchant'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Merchant'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/merchants/{id}':
+    get:
+      tags:
+        - Merchant Service
+      summary: Get the merchant with the specified merchant id
+      operationId: findMerchantWithID
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Merchant id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Merchant'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  Merchant:
+    type: object
+    allOf:
+      - $ref: '#/definitions/NewMerchant'
+      - required:
+          - id
+        properties:
+          id:
+            type: integer
+            format: int64
+  NewMerchant:
+    type: object
+    properties:
+      name:
+        type: string
+      address:
+        type: string
+      phone:
+        type: string

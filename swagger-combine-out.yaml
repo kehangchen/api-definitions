@@ -1,0 +1,636 @@
+swagger: '2.0'
+schemes:
+  - https
+info:
+  contact:
+    name: Merchant E-Solutions
+    url: 'https://www.merchante-solutions.com/developer/support'
+    x-twitter: merchante-solutions
+  description: >
+
+    # Introduction
+
+    Description of Merchant E-Solutions (MeS) Micro-Service API.
+
+
+    Current limitations:
+      * MeS service does not support [cross origin headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
+      for security reasons, therefore it is not possible to use Swagger UI and make API calls directly from browser.
+      * Modification API requests (`POST`, `DELETE`) require additional security
+      * Consider the [www.merchante-solutions limitations](https://www.merchante-solutions.com/developer/limits/) for API calls that depends on App Mode.
+
+    **Warning:** For Apps [created on or after Aug,
+    2019](http://www.merchante-solutions.com/developer/changelog/) API responses
+
+    containing media objects no longer return the `data` field in `comments` and
+    `likes` nodes.
+
+
+    Last update: 2019-08-08
+  termsOfService: 'https://www.merchante-solutions.com/about/legal/terms/api/'
+  title: MeS API Definition
+  version: 1.0.0
+  x-apisguru-categories:
+    - social
+    - media
+  x-logo:
+    url: >-
+      https://www.merchante-solutions.com/wp-content/themes/Foundation-master/img/logo2.png
+  x-origin:
+    - format: swagger
+      url: >-
+        https://raw.githubusercontent.com/mes/swagger-api-collection/master/api/yaml/swagger-combine-out.yaml
+      version: '2.0'
+  x-preferred: true
+  x-providerName: www.merchante-solutions.com
+  x-unofficialSpec: true
+externalDocs:
+  description: MeS Developer Documentation
+  url: 'https://www.merchante-solutions.com/developer'
+produces:
+  - application/json
+securityDefinitions:
+  api_key:
+    in: query
+    name: access_token
+    type: apiKey
+  instagram_auth:
+    authorizationUrl: 'https://www.merchante-solutions.com/oauth/authorize/'
+    flow: implicit
+    scopes:
+      basic: to read a user's profile info and media (granted by default)
+      comments: to post and delete comments on a user's behalf
+      follower_list: to read the list of followers and followed-by users
+      likes: to like and unlike media on a user's behalf
+      public_content: to read any public profile info and media on a userâ€™s behalf
+      relationships: to follow and unfollow accounts on a user's behalf
+    type: oauth2
+servers:
+  - url: 'https://api.mes.com/v1'
+    description: Live Server
+  - url: 'https://api.mes-sandbox.com/v1'
+    description: Sandbox Server
+tags:
+  - description: User management
+    name: User Service
+  - description: Merchant management
+    name: Merchant Service
+  - description: Allow other services log messages asynchronozely
+    name: Logging Service
+  - description: Netsuite preparation and upload
+    name: Netsuite Service
+x-tagGroups:
+  - name: Data
+    tags:
+      - Merchant Service
+      - User Service
+  - name: Task
+    tags:
+      - Netsuite Service
+  - name: Utility
+    tags:
+      - Logging Service
+paths:
+  /users:
+    get:
+      tags:
+        - User Service
+      description: Get all the users
+      operationId: getUsers
+      parameters:
+        - name: limit
+          in: query
+          description: maximum number of results to return
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User service response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - required:
+                        - firstName
+                        - lastName
+                      properties:
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        ssn:
+                          type: string
+                    - required:
+                        - id
+                      properties:
+                        id:
+                          type: integer
+                          format: int64
+              example:
+                - id: 1
+                  firstName: John
+                  lastName: Doe
+                  ssn: 111-222-1111
+                - id: 2
+                  firstName: Marry
+                  lastName: Mei
+                  ssn: 111-222-1112
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                  message:
+                    type: string
+    post:
+      tags:
+        - User Service
+      description: Add a new user to the system
+      operationId: addUser
+      requestBody:
+        description: User to add to the system
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - firstName
+                - lastName
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                ssn:
+                  type: string
+      responses:
+        '200':
+          description: User service response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - required:
+                      - firstName
+                      - lastName
+                    properties:
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      ssn:
+                        type: string
+                  - required:
+                      - id
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+              example:
+                - id: 1
+                  firstName: John
+                  lastName: Doe
+                  ssn: 111-222-1113
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                  message:
+                    type: string
+  '/users/{id}':
+    get:
+      tags:
+        - User Service
+      description: Get the user with the specified user id
+      operationId: findUserWithID
+      parameters:
+        - name: id
+          in: path
+          description: user id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User service response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - required:
+                      - firstName
+                      - lastName
+                    properties:
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      ssn:
+                        type: string
+                  - required:
+                      - id
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+              example:
+                id: 1
+                firstName: John
+                lastName: Joe
+                ssn: 111-222-1114
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                  message:
+                    type: string
+  /merchants:
+    get:
+      tags:
+        - Merchant Service
+      summary: Get all the merchants
+      operationId: gitMerchants
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: meaningful_query_param
+          in: query
+          description: meaningful_query_param
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              allOf:
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                    address:
+                      type: string
+                    phone:
+                      type: string
+                - required:
+                    - id
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    post:
+      tags:
+        - Merchant Service
+      summary: Add a new merchant to the system
+      operationId: addMerchant
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: payload
+          description: payload
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              address:
+                type: string
+              phone:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            allOf:
+              - type: object
+                properties:
+                  name:
+                    type: string
+                  address:
+                    type: string
+                  phone:
+                    type: string
+              - required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/merchants/{id}':
+    get:
+      tags:
+        - Merchant Service
+      summary: Get the merchant with the specified merchant id
+      operationId: findMerchantWithID
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Merchant id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            allOf:
+              - type: object
+                properties:
+                  name:
+                    type: string
+                  address:
+                    type: string
+                  phone:
+                    type: string
+              - required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /netsuite/prepare:
+    post:
+      tags:
+        - Netsuite Service
+      summary: Prepare proper records
+      operationId: prepareRecords
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: payload
+          description: payload
+          required: true
+          schema:
+            type: object
+            properties:
+              jobName:
+                type: string
+              username:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            allOf:
+              - type: object
+                properties:
+                  jobName:
+                    type: string
+                  username:
+                    type: string
+              - required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /newsuite/upload:
+    post:
+      tags:
+        - Netsuite Service
+      summary: Upload prepared records to Netsuite site
+      operationId: uploadRecords
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: payload
+          description: payload
+          required: true
+          schema:
+            type: object
+            properties:
+              batchName:
+                type: string
+              content:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            allOf:
+              - type: object
+                properties:
+                  batchName:
+                    type: string
+                  content:
+                    type: string
+              - required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /logs:
+    get:
+      tags:
+        - Logging Service
+      summary: Get all the logged messages
+      operationId: gitLogs
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: meaningful_query_param
+          in: query
+          description: meaningful_query_param
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              allOf:
+                - type: object
+                  properties:
+                    appName:
+                      type: string
+                    content:
+                      type: string
+                - required:
+                    - id
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    post:
+      tags:
+        - Logging Service
+      summary: Add new message to be pesisted
+      operationId: addLog
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: payload
+          description: payload
+          required: true
+          schema:
+            type: object
+            properties:
+              appName:
+                type: string
+              content:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            allOf:
+              - type: object
+                properties:
+                  appName:
+                    type: string
+                  content:
+                    type: string
+              - required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/logs/{id}':
+    get:
+      tags:
+        - Logging Service
+      summary: Get the logged messages with the specified log id
+      operationId: findLogWithID
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: Log id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            allOf:
+              - type: object
+                properties:
+                  appName:
+                    type: string
+                  content:
+                    type: string
+              - required:
+                  - id
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found

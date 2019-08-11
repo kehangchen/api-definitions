@@ -1,0 +1,91 @@
+swagger: '2.0'
+schemes:
+  - https
+# host: api.mes.com
+# basePath: /v1
+info:
+  contact:
+    name: Merchant E-Solutions
+    url: 'https://www.merchante-solutions.com/developer/support'
+    x-twitter: merchante-solutions
+  description: |
+
+    # Introduction
+    Description of Merchant E-Solutions (MeS) Micro-Service API.
+
+    Current limitations:
+      * MeS service does not support [cross origin headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
+      for security reasons, therefore it is not possible to use Swagger UI and make API calls directly from browser.
+      * Modification API requests (`POST`, `DELETE`) require additional security
+      * Consider the [www.merchante-solutions limitations](https://www.merchante-solutions.com/developer/limits/) for API calls that depends on App Mode.
+
+    **Warning:** For Apps [created on or after Aug, 2019](http://www.merchante-solutions.com/developer/changelog/) API responses
+    containing media objects no longer return the `data` field in `comments` and `likes` nodes.
+
+    Last update: 2019-08-08
+  termsOfService: 'https://www.merchante-solutions.com/about/legal/terms/api/'
+  title: MeS API Definition
+  version: 1.0.0
+  x-apisguru-categories:
+    - social
+    - media
+  x-logo:
+    url: 'https://www.merchante-solutions.com/wp-content/themes/Foundation-master/img/logo2.png'
+  x-origin:
+    - format: swagger
+      url: 'https://raw.githubusercontent.com/mes/swagger-api-collection/master/api/yaml/swagger-combine-out.yaml'
+      version: '2.0'
+  x-preferred: true
+  x-providerName: www.merchante-solutions.com
+  x-unofficialSpec: true
+externalDocs:
+  description: MeS Developer Documentation
+  url: 'https://www.merchante-solutions.com/developer'
+produces:
+  - application/json
+securityDefinitions:
+  api_key:
+    in: query
+    name: access_token
+    type: apiKey
+  instagram_auth:
+    authorizationUrl: 'https://www.merchante-solutions.com/oauth/authorize/'
+    flow: implicit
+    scopes:
+      basic: to read a user's profile info and media (granted by default)
+      comments: to post and delete comments on a user's behalf
+      follower_list: to read the list of followers and followed-by users
+      likes: to like and unlike media on a user's behalf
+      public_content: to read any public profile info and media on a userâ€™s behalf
+      relationships: to follow and unfollow accounts on a user's behalf
+    type: oauth2
+servers:
+  - url: https://api.mes.com/v1
+    description: Live Server
+  - url: https://api.mes-sandbox.com/v1
+    description: Sandbox Server
+tags:
+  - description: User management
+    name: User Service
+  - description: Merchant management
+    name: Merchant Service
+  - description: Allow other services log messages asynchronozely
+    name: Logging Service
+  - description: Netsuite preparation and upload
+    name: Netsuite Service
+x-tagGroups:
+  - name: Data
+    tags:
+      - Merchant Service
+      - User Service
+  - name: Task
+    tags:
+      - Netsuite Service
+  - name: Utility
+    tags:
+      - Logging Service
+apis:
+  - url: 'https://api.swaggerhub.com/apis/FS-Mind/data-user_service/1.0-oas3'
+  - url: 'https://api.swaggerhub.com/apis/FS-Mind/data-merchnat_service/1.0'
+  - url: 'https://api.swaggerhub.com/apis/FS-Mind/task-netsuite_service/1.0'
+  - url: 'https://api.swaggerhub.com/apis/FS-Mind/utility-logging_service/1.0'
